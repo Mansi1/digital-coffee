@@ -7,11 +7,13 @@ import { adminAuthRoutes } from './features/admin/auth/routes.js'
 import { adminProductRoutes } from './features/admin/product/routes.js'
 import { kioskRoutes } from './features/kiosk/routes.js'
 import { notFound, onError } from './middleware/error-handler.js'
+import { jwtAuth } from './middleware/jwt-auth.js'
 
 export const app = new OpenAPIHono()
 
 app.use('*', logger())
 app.use('*', cors({ origin: process.env.CORS_ORIGIN ?? 'http://localhost:9000', credentials: true }))
+app.use('/admin/*', jwtAuth)
 app.onError(onError)
 app.notFound(notFound)
 
