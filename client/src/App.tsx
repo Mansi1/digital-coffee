@@ -4,11 +4,11 @@ import { ProductCard } from './components/ProductCard';
 import { chunkArray } from './functions/chunkArray';
 import { Layout } from './components/Layout';
 import { renderPrice } from './functions/renderPrice';
-import { cn } from './functions/cn';
 import PinInput from './components/PinInput';
+import { Button } from './components/Button';
 
 type ProductState =
-  | { state: 'LOADING' }
+  | { state: 'LOADING' |'ERROR' }
   | { state: 'SUCCESS'; products: Array<Product> };
 function App() {
   const [productLoadingState, setProductLoadingState] = useState<ProductState>({
@@ -22,7 +22,7 @@ function App() {
       const products = await kioskApi.getProducts();
       setProductLoadingState({ state: 'SUCCESS', products });
     } catch (e) {
-      setProductLoadingState({ state: 'LOADING' });
+      setProductLoadingState({ state: 'ERROR' });
     }
   };
   useEffect(() => {
@@ -84,17 +84,14 @@ function App() {
             </div>
           </div>
           <div className="flex justify-center">
-            <button
-              className={cn('text-center text-2xl', {
-                'cursor-pointer': totalPrice > 0,
-              })}
+            <Button
               disabled={totalPrice === 0}
               onClick={() => {}}
             >
               Weiter {renderPrice(totalPrice)}
-            </button>
+            </Button>
           </div>
-          <PinInput length={4} onComplete={()=> {}} />
+          <PinInput  onComplete={(pin)=> {alert(pin)}} />
         </>
       )}
     </Layout>
