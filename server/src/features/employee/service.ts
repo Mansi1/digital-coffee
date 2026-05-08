@@ -7,6 +7,7 @@ export class EmployeeService {
         isActive: true,
       },
       select: {
+        id: true,
         name: true,
         company: {
           select: {
