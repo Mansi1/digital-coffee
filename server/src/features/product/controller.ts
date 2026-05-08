@@ -1,11 +1,11 @@
 import type { Context } from 'hono'
 import { ProductService } from './service.js'
 
-const toResponse = (p: { id: string; name: string; price: number; isActive: boolean; createdAt: Date; updatedAt: Date }) => ({
+const toResponse = (p: { id: string; name: string; price: number; deactivatedAt: Date | null; createdAt: Date; updatedAt: Date }) => ({
   id: p.id,
   name: p.name,
   price: p.price,
-  isActive: p.isActive,
+  deactivatedAt: p.deactivatedAt?.toISOString() ?? null,
   createdAt: p.createdAt.toISOString(),
   updatedAt: p.updatedAt.toISOString(),
 })

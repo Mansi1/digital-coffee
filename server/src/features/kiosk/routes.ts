@@ -5,6 +5,7 @@ import {
   AuthLoginSchema,
   AuthResponseSchema,
   ErrorSchema as AuthErrorSchema,
+  AuthRegisterSchema,
 } from "../auth/schema.js";
 import {
   ErrorSchema,
@@ -14,6 +15,8 @@ import {
 import { ProductController } from "../product/controller.js";
 import { EmployeeController } from "../employee/controller.js";
 import { EmployeeResponseSchema } from "../employee/schema.js";
+import { CompanyController } from "../company/controller.js";
+import z from "zod";
 
 const { router: kioskRoutes } = new Routes([
   {
@@ -103,6 +106,62 @@ const { router: kioskRoutes } = new Routes([
       },
     },
     controllerFN: EmployeeController.getAll,
+  },
+  {
+    path: "/companies",
+    method: "get",
+    tags: ["Kiosk"],
+    description: "Get list of companies (for testing/demo purposes)",
+    responses: {
+      200: {
+        content: {
+          "application/json": {
+            schema: z.object({
+              data: z.array(
+                z.object({
+                  id: z.string(),
+                  name: z.string(),
+                  email: z.email(),
+                }),
+              ),
+            }),
+          },
+        },
+        description: "List of companies retrieved successfully",
+      },
+      500: {
+        content: { "application/json": { schema: ErrorSchema } },
+        description: "Server error while retrieving companies",
+      },
+    },
+    controllerFN: CompanyController.getAll,
+  },
+  {
+    path: "/register",
+    method: "post",
+    tags: ["Kiosk"],
+    description: "Register a new employee (for testing/demo purposes)",
+    request: {
+      body: {
+        content: { "application/json": { schema: AuthRegisterSchema } },
+        required: true,
+      },
+    },
+    responses: {
+      201: {
+        content: { "application/json": { schema: AuthResponseSchema } },
+        description: "Employee registered successfully",
+      },
+      400: {
+        content: { "application/json": { schema: AuthErrorSchema } },
+        description: "Invalid request data",
+      },
+      409: {
+        content: { "application/json": { schema: AuthErrorSchema } },
+        description: "Employee with this email already exists",
+      },
+    },
+    controllerFN: AuthController.register,
   },
 ]);
 

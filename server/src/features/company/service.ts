@@ -1,19 +1,15 @@
 import { prisma } from "../../lib/prisma.js";
 
-export class EmployeeService {
+export class CompanyService {
   static async getAll() {
-    return await prisma.employee.findMany({
+    return await prisma.company.findMany({
       where: {
         deactivatedAt: null,
       },
       select: {
         id: true,
         name: true,
-        company: {
-          select: {
-            name: true,
-          },
-        },
+        email: true,
       },
     });
   }

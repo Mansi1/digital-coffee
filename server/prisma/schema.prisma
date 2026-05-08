@@ -19,26 +19,27 @@ enum Role {
 }
 
 model Company {
-  id        String     @id @default(ulid())
-  name      String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  email     String     @unique
-  employees Employee[]
+  id            String     @id @default(ulid())
+  name          String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  email         String     @unique
+  deactivatedAt DateTime?
+  employees     Employee[]
 }
 
 model Employee {
-  id        String   @id @default(ulid())
-  name      String
-  email     String   @unique
-  pin       String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
-  orders    Order[]
-  isActive  Boolean  @default(true)
+  id            String    @id @default(ulid())
+  name          String
+  email         String    @unique
+  pin           String
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  companyId     String
+  company       Company   @relation(fields: [companyId], references: [id])
+  orders        Order[]
+  deactivatedAt DateTime?
 }
 
 model Order {
@@ -54,11 +55,11 @@ model Order {
 }
 
 model Product {
-  id        String   @id @default(ulid())
-  name      String
-  price     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isActive  Boolean  @default(true)
-  orders    Order[]
+  id            String    @id @default(ulid())
+  name          String
+  price         Float
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deactivatedAt DateTime?
+  orders        Order[]
 }

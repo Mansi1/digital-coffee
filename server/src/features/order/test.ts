@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest'
 import { app } from '../../app.js'
 import { prisma } from '../../lib/prisma.js'
 
-const BASE = '/orders'
+const BASE = '/kiosk/orders'
 
 describe('POST /orders', () => {
   let employeeId: string

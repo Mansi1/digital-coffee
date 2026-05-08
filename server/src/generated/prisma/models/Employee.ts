@@ -33,7 +33,7 @@ export type EmployeeMinAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   companyId: string | null
-  isActive: boolean | null
+  deactivatedAt: Date | null
 }
 
 export type EmployeeMaxAggregateOutputType = {
@@ -45,7 +45,7 @@ export type EmployeeMaxAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   companyId: string | null
-  isActive: boolean | null
+  deactivatedAt: Date | null
 }
 
 export type EmployeeCountAggregateOutputType = {
@@ -57,7 +57,7 @@ export type EmployeeCountAggregateOutputType = {
   createdAt: number
   updatedAt: number
   companyId: number
-  isActive: number
+  deactivatedAt: number
   _all: number
 }
 
@@ -71,7 +71,7 @@ export type EmployeeMinAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   companyId?: true
-  isActive?: true
+  deactivatedAt?: true
 }
 
 export type EmployeeMaxAggregateInputType = {
@@ -83,7 +83,7 @@ export type EmployeeMaxAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   companyId?: true
-  isActive?: true
+  deactivatedAt?: true
 }
 
 export type EmployeeCountAggregateInputType = {
@@ -95,7 +95,7 @@ export type EmployeeCountAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   companyId?: true
-  isActive?: true
+  deactivatedAt?: true
   _all?: true
 }
 
@@ -180,7 +180,7 @@ export type EmployeeGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   companyId: string
-  isActive: boolean
+  deactivatedAt: Date | null
   _count: EmployeeCountAggregateOutputType | null
   _min: EmployeeMinAggregateOutputType | null
   _max: EmployeeMaxAggregateOutputType | null
@@ -213,7 +213,7 @@ export type EmployeeWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
   companyId?: Prisma.StringFilter<"Employee"> | string
-  isActive?: Prisma.BoolFilter<"Employee"> | boolean
+  deactivatedAt?: Prisma.DateTimeNullableFilter<"Employee"> | Date | string | null
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   orders?: Prisma.OrderListRelationFilter
 }
@@ -227,7 +227,7 @@ export type EmployeeOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
-  isActive?: Prisma.SortOrder
+  deactivatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   company?: Prisma.CompanyOrderByWithRelationInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
 }
@@ -244,7 +244,7 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
   companyId?: Prisma.StringFilter<"Employee"> | string
-  isActive?: Prisma.BoolFilter<"Employee"> | boolean
+  deactivatedAt?: Prisma.DateTimeNullableFilter<"Employee"> | Date | string | null
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   orders?: Prisma.OrderListRelationFilter
 }, "id" | "email">
@@ -258,7 +258,7 @@ export type EmployeeOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
-  isActive?: Prisma.SortOrder
+  deactivatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.EmployeeCountOrderByAggregateInput
   _max?: Prisma.EmployeeMaxOrderByAggregateInput
   _min?: Prisma.EmployeeMinOrderByAggregateInput
@@ -276,7 +276,7 @@ export type EmployeeScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Employee"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Employee"> | Date | string
   companyId?: Prisma.StringWithAggregatesFilter<"Employee"> | string
-  isActive?: Prisma.BoolWithAggregatesFilter<"Employee"> | boolean
+  deactivatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Employee"> | Date | string | null
 }
 
 export type EmployeeCreateInput = {
@@ -287,7 +287,7 @@ export type EmployeeCreateInput = {
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  isActive?: boolean
+  deactivatedAt?: Date | string | null
   company: Prisma.CompanyCreateNestedOneWithoutEmployeesInput
   orders?: Prisma.OrderCreateNestedManyWithoutEmployeeInput
 }
@@ -301,7 +301,7 @@ export type EmployeeUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
-  isActive?: boolean
+  deactivatedAt?: Date | string | null
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
@@ -313,7 +313,7 @@ export type EmployeeUpdateInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deactivatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   company?: Prisma.CompanyUpdateOneRequiredWithoutEmployeesNestedInput
   orders?: Prisma.OrderUpdateManyWithoutEmployeeNestedInput
 }
@@ -327,7 +327,7 @@ export type EmployeeUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deactivatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   orders?: Prisma.OrderUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
@@ -340,7 +340,7 @@ export type EmployeeCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
-  isActive?: boolean
+  deactivatedAt?: Date | string | null
 }
 
 export type EmployeeUpdateManyMutationInput = {
@@ -351,7 +351,7 @@ export type EmployeeUpdateManyMutationInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deactivatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type EmployeeUncheckedUpdateManyInput = {
@@ -363,7 +363,7 @@ export type EmployeeUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deactivatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type EmployeeListRelationFilter = {
@@ -385,7 +385,7 @@ export type EmployeeCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
-  isActive?: Prisma.SortOrder
+  deactivatedAt?: Prisma.SortOrder
 }
 
 export type EmployeeMaxOrderByAggregateInput = {
@@ -397,7 +397,7 @@ export type EmployeeMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
-  isActive?: Prisma.SortOrder
+  deactivatedAt?: Prisma.SortOrder
 }
 
 export type EmployeeMinOrderByAggregateInput = {
@@ -409,7 +409,7 @@ export type EmployeeMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
-  isActive?: Prisma.SortOrder
+  deactivatedAt?: Prisma.SortOrder
 }
 
 export type EmployeeScalarRelationFilter = {
@@ -463,10 +463,6 @@ export type EnumRoleFieldUpdateOperationsInput = {
   set?: $Enums.Role
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type EmployeeCreateNestedOneWithoutOrdersInput = {
   create?: Prisma.XOR<Prisma.EmployeeCreateWithoutOrdersInput, Prisma.EmployeeUncheckedCreateWithoutOrdersInput>
   connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutOrdersInput
@@ -489,7 +485,7 @@ export type EmployeeCreateWithoutCompanyInput = {
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  isActive?: boolean
+  deactivatedAt?: Date | string | null
   orders?: Prisma.OrderCreateNestedManyWithoutEmployeeInput
 }
 
@@ -501,7 +497,7 @@ export type EmployeeUncheckedCreateWithoutCompanyInput = {
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  isActive?: boolean
+  deactivatedAt?: Date | string | null
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
@@ -543,7 +539,7 @@ export type EmployeeScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
   companyId?: Prisma.StringFilter<"Employee"> | string
-  isActive?: Prisma.BoolFilter<"Employee"> | boolean
+  deactivatedAt?: Prisma.DateTimeNullableFilter<"Employee"> | Date | string | null
 }
 
 export type EmployeeCreateWithoutOrdersInput = {
@@ -554,7 +550,7 @@ export type EmployeeCreateWithoutOrdersInput = {
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  isActive?: boolean
+  deactivatedAt?: Date | string | null
   company: Prisma.CompanyCreateNestedOneWithoutEmployeesInput
 }
 
@@ -567,7 +563,7 @@ export type EmployeeUncheckedCreateWithoutOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
-  isActive?: boolean
+  deactivatedAt?: Date | string | null
 }
 
 export type EmployeeCreateOrConnectWithoutOrdersInput = {
@@ -594,7 +590,7 @@ export type EmployeeUpdateWithoutOrdersInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deactivatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   company?: Prisma.CompanyUpdateOneRequiredWithoutEmployeesNestedInput
 }
 
@@ -607,7 +603,7 @@ export type EmployeeUncheckedUpdateWithoutOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deactivatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type EmployeeCreateManyCompanyInput = {
@@ -618,7 +614,7 @@ export type EmployeeCreateManyCompanyInput = {
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  isActive?: boolean
+  deactivatedAt?: Date | string | null
 }
 
 export type EmployeeUpdateWithoutCompanyInput = {
@@ -629,7 +625,7 @@ export type EmployeeUpdateWithoutCompanyInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deactivatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   orders?: Prisma.OrderUpdateManyWithoutEmployeeNestedInput
 }
 
@@ -641,7 +637,7 @@ export type EmployeeUncheckedUpdateWithoutCompanyInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deactivatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   orders?: Prisma.OrderUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
@@ -653,7 +649,7 @@ export type EmployeeUncheckedUpdateManyWithoutCompanyInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deactivatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -696,7 +692,7 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   createdAt?: boolean
   updatedAt?: boolean
   companyId?: boolean
-  isActive?: boolean
+  deactivatedAt?: boolean
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   orders?: boolean | Prisma.Employee$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
@@ -711,7 +707,7 @@ export type EmployeeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   createdAt?: boolean
   updatedAt?: boolean
   companyId?: boolean
-  isActive?: boolean
+  deactivatedAt?: boolean
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["employee"]>
 
@@ -724,7 +720,7 @@ export type EmployeeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   createdAt?: boolean
   updatedAt?: boolean
   companyId?: boolean
-  isActive?: boolean
+  deactivatedAt?: boolean
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["employee"]>
 
@@ -737,10 +733,10 @@ export type EmployeeSelectScalar = {
   createdAt?: boolean
   updatedAt?: boolean
   companyId?: boolean
-  isActive?: boolean
+  deactivatedAt?: boolean
 }
 
-export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "pin" | "role" | "createdAt" | "updatedAt" | "companyId" | "isActive", ExtArgs["result"]["employee"]>
+export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "pin" | "role" | "createdAt" | "updatedAt" | "companyId" | "deactivatedAt", ExtArgs["result"]["employee"]>
 export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   orders?: boolean | Prisma.Employee$ordersArgs<ExtArgs>
@@ -768,7 +764,7 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     createdAt: Date
     updatedAt: Date
     companyId: string
-    isActive: boolean
+    deactivatedAt: Date | null
   }, ExtArgs["result"]["employee"]>
   composites: {}
 }
@@ -1202,7 +1198,7 @@ export interface EmployeeFieldRefs {
   readonly createdAt: Prisma.FieldRef<"Employee", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Employee", 'DateTime'>
   readonly companyId: Prisma.FieldRef<"Employee", 'String'>
-  readonly isActive: Prisma.FieldRef<"Employee", 'Boolean'>
+  readonly deactivatedAt: Prisma.FieldRef<"Employee", 'DateTime'>
 }
     
 

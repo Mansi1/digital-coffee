@@ -14,12 +14,14 @@ beforeAll(async () => {
   await prisma.employee.createMany({
     data: [
       {
+        name: 'Test Admin',
         email: 'admin@test.com',
         pin: await hash('12345'),
         role: 'ADMIN',
         companyId: company.id,
       },
       {
+        name: 'Test User',
         email: 'user@test.com',
         pin: await hash('12345'),
         role: 'USER',

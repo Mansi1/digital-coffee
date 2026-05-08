@@ -3,7 +3,7 @@ import { prisma } from '../../lib/prisma.js'
 
 export class ProductService {
   static async getActive() {
-    return prisma.product.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } })
+    return prisma.product.findMany({ where: { deactivatedAt: null }, orderBy: { name: 'asc' } })
   }
 
   static async getAll() {
@@ -14,7 +14,7 @@ export class ProductService {
     return prisma.product.create({ data })
   }
 
-  static async update(id: string, data: { name?: string; price?: number; isActive?: boolean }) {
+  static async update(id: string, data: { name?: string; price?: number }) {
     const product = await prisma.product.findUnique({ where: { id } })
     if (!product) throw new HTTPException(404, { message: 'Product not found' })
     return prisma.product.update({ where: { id }, data })
@@ -23,6 +23,6 @@ export class ProductService {
   static async deactivate(id: string) {
     const product = await prisma.product.findUnique({ where: { id } })
     if (!product) throw new HTTPException(404, { message: 'Product not found' })
-    return prisma.product.update({ where: { id }, data: { isActive: false } })
+    return prisma.product.update({ where: { id }, data: { deactivatedAt: new Date() } })
   }
 }
