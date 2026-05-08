@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getProducts, type Product } from './api';
+import { kioskApi, type Product } from './api';
 import { ProductCard } from './components/ProductCard';
 import { chunkArray } from './functions/chunkArray';
 import { Layout } from './components/Layout';
@@ -19,7 +19,7 @@ function App() {
   const loadProducts = async () => {
     try {
       setProductLoadingState({ state: 'LOADING' });
-      const products = await getProducts();
+      const products = await kioskApi.getProducts();
       setProductLoadingState({ state: 'SUCCESS', products });
     } catch (e) {
       setProductLoadingState({ state: 'LOADING' });
