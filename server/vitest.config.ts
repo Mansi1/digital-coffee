@@ -7,7 +7,7 @@ export default defineConfig({
     fileParallelism: false,
     include: ['src/**/test.ts', 'src/**/*.spec.ts'],
     env: {
-      DATABASE: process.env.DATABASE ?? 'postgresql://dev:dev@dev-postgres:5432/dev',
+      DATABASE: process.env.DATABASE,
       PORT: '3001',
       JWT_SECRET: process.env.JWT_SECRET ?? 'test-secret',
     },
