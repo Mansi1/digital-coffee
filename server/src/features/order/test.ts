@@ -3,8 +3,9 @@ import { app } from '../../app.js'
 import { prisma } from '../../lib/prisma.js'
 
 const BASE = '/kiosk/orders'
+const PIN = '12345'
 
-describe('POST /orders', () => {
+describe('POST /kiosk/orders', () => {
   let employeeId: string
   let productId: string
 
@@ -21,17 +22,14 @@ describe('POST /orders', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         employeeId,
+        pin: PIN,
         orders: [{ productId, amount: 2 }],
       }),
     })
     expect(res.status).toBe(201)
     const body = await res.json()
     expect(body.data).toHaveLength(1)
-    expect(body.data[0]).toMatchObject({
-      employeeId,
-      productId,
-      amount: 2,
-    })
+    expect(body.data[0]).toMatchObject({ employeeId, productId, amount: 2 })
     expect(typeof body.data[0].price).toBe('number')
     expect(typeof body.data[0].id).toBe('string')
   })
@@ -43,6 +41,7 @@ describe('POST /orders', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         employeeId,
+        pin: PIN,
         orders: [
           { productId, amount: 1 },
           { productId: secondProduct!.id, amount: 3 },
@@ -58,9 +57,16 @@ describe('POST /orders', () => {
     const res = await app.request(BASE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        orders: [{ productId, amount: 1 }],
-      }),
+      body: JSON.stringify({ pin: PIN, orders: [{ productId, amount: 1 }] }),
+    })
+    expect(res.status).toBe(400)
+  })
+
+  it('400 - missing pin', async () => {
+    const res = await app.request(BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ employeeId, orders: [{ productId, amount: 1 }] }),
     })
     expect(res.status).toBe(400)
   })
@@ -69,7 +75,7 @@ describe('POST /orders', () => {
     const res = await app.request(BASE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ employeeId }),
+      body: JSON.stringify({ employeeId, pin: PIN }),
     })
     expect(res.status).toBe(400)
   })
@@ -80,24 +86,37 @@ describe('POST /orders', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         employeeId,
+        pin: PIN,
         orders: [{ productId, amount: 0 }],
       }),
     })
     expect(res.status).toBe(400)
   })
 
-  it('404 - employee not found', async () => {
+  it('401 - wrong pin', async () => {
+    const res = await app.request(BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        employeeId,
+        pin: '99999',
+        orders: [{ productId, amount: 1 }],
+      }),
+    })
+    expect(res.status).toBe(401)
+  })
+
+  it('401 - employee not found', async () => {
     const res = await app.request(BASE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         employeeId: 'nonexistent-employee-id',
+        pin: PIN,
         orders: [{ productId, amount: 1 }],
       }),
     })
-    expect(res.status).toBe(404)
-    const body = await res.json()
-    expect(body.error.message).toBe('Employee not found')
+    expect(res.status).toBe(401)
   })
 
   it('404 - product not found', async () => {
@@ -106,6 +125,7 @@ describe('POST /orders', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         employeeId,
+        pin: PIN,
         orders: [{ productId: 'nonexistent-product-id', amount: 1 }],
       }),
     })

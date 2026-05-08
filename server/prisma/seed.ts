@@ -12,17 +12,15 @@ async function main() {
   await prisma.company.deleteMany();
 
   // Seed new data
-  const { exampleCompany, anotherCompany } = await seedCompany(prisma);
-  const { admin, user } = await seedEmployees(prisma);
+  const { bayernSoft, waldTec, deggendorfDigital, donauLogistik } = await seedCompany(prisma);
+  const { admin, employeeCount } = await seedEmployees(prisma);
   const { productCount } = await seedProduct(prisma);
-
   const { orderCount } = await seedOrders(prisma);
 
   console.log("Seeded:", {
-    exampleCompany,
-    anotherCompany,
-    admin,
-    user,
+    companies: [bayernSoft.name, waldTec.name, deggendorfDigital.name, donauLogistik.name],
+    admin: admin.email,
+    employeeCount,
     productCount,
     orderCount,
   });

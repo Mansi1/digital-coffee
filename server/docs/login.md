@@ -1,207 +1,197 @@
-# Login & Authentifizierung
+# Auth-Flow
 
-Diese Seite erklärt den kompletten Auth-Flow: von der HTTP-Anfrage bis zum gesetzten Cookie und wie nachfolgende Requests damit abgesichert werden.
+Das System hat zwei getrennte Auth-Flows: einen einfachen Kiosk-Flow ohne Session und einen JWT-basierten Admin-Flow.
 
 ---
 
-## Übersicht
+## Kiosk — Bestellung mit PIN
+
+Kein Login, keine Session. Der Mitarbeiter identifiziert sich direkt beim Aufgeben der Bestellung per `employeeId` und `pin`.
 
 ```
 Client                          Server
   │                               │
-  │  POST /auth/login             │
-  │  { email, password }  ──────► │ 1. Validierung (Zod)
-  │                               │ 2. User in DB suchen
-  │                               │ 3. Passwort prüfen (argon2)
-  │                               │ 4. JWT signieren
-  │  200 + Set-Cookie: token=...  │
-  │ ◄──────────────────────────── │ 5. Cookie setzen
-  │                               │
-  │  GET /todos                   │
-  │  Cookie: token=...    ──────► │ 6. Cookie auslesen (jwtAuth)
-  │                               │ 7. JWT verifizieren → user ins Context
-  │                               │ 8. Permission prüfen
-  │  200 { data: [...] }          │
-  │ ◄──────────────────────────── │ 9. Response
+  │  POST /kiosk/orders           │
+  │  { employeeId, pin, orders }  │
+  │  ────────────────────────►    │ 1. Zod-Validierung
+  │                               │ 2. Employee per ID suchen
+  │                               │ 3. PIN mit argon2 prüfen
+  │                               │ 4. Produkte suchen, Preise berechnen
+  │  201 { data: orders }         │
+  │ ◄──────────────────────────── │ 5. Bestellungen zurück (kein Cookie)
 ```
 
----
-
-## Schritt für Schritt
-
-### 1. Route — `POST /auth/login`
-
-**Datei:** `src/features/auth/routes.ts`
-
-Der Client sendet E-Mail und Passwort als JSON-Body:
+### Request
 
 ```http
-POST /auth/login
+POST /kiosk/orders
 Content-Type: application/json
 
 {
-  "email": "user@example.com",
-  "password": "secret123"
+  "employeeId": "01JX...",
+  "pin": "22222",
+  "orders": [
+    { "productId": "01JX...", "amount": 1 }
+  ]
 }
 ```
 
-Die Route ist in der `Routes`-Klasse registriert und hat ein OpenAPI-Schema hinterlegt. Bevor der Controller aufgerufen wird, validiert Hono automatisch den Body gegen das `AuthBodySchema`.
+### Response `201`
+
+```json
+{
+  "data": [
+    {
+      "id": "01JX...",
+      "employeeId": "01JX...",
+      "productId": "01JX...",
+      "amount": 1,
+      "price": 0.80,
+      "createdAt": "2026-05-08T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+### Fehlercodes
+
+| Status | Grund |
+| ------ | ----- |
+| `400`  | Fehlende oder ungültige Felder |
+| `401`  | Employee nicht gefunden oder PIN falsch |
+| `404`  | Produkt nicht gefunden |
+
+::: info Sicherheit
+Beide Fehlerfälle (nicht gefunden + falscher PIN) geben dieselbe Meldung `"Invalid credentials"` zurück — kein Enumeration-Angriff möglich.
+:::
 
 ---
 
-### 2. Validierung — `AuthBodySchema`
-
-**Datei:** `src/features/auth/schema.ts`
-
-```ts
-const AuthBodySchema = z.object({
-  email: z.email(),
-  password: z.string().min(6),
-})
-```
-
-Schlägt die Validierung fehl (z. B. keine gültige E-Mail, Passwort zu kurz), antwortet die API direkt mit **400 Bad Request** — der Controller wird nicht erreicht.
-
----
-
-### 3. Service — Datenbankabfrage & Passwortprüfung
-
-**Datei:** `src/features/auth/service.ts`
+## Admin — JWT-Login
 
 ```
-AuthService.login(email, password)
-  │
-  ├─ User per E-Mail in der DB suchen
-  │   └─ nicht gefunden → 401 Unauthorized
-  │
-  └─ Passwort mit argon2 verifizieren
-      └─ falsch → 401 Unauthorized
+Client                          Server
+  │                               │
+  │  POST /admin/auth/login       │
+  │  { employeeId, pin }  ──────► │ 1. Zod-Validierung
+  │                               │ 2. Employee suchen
+  │                               │ 3. PIN prüfen (argon2)
+  │                               │ 4. Rolle prüfen → muss ADMIN sein
+  │                               │ 5. JWT signieren (8h)
+  │  200 + Set-Cookie: token=...  │
+  │ ◄──────────────────────────── │ 6. HttpOnly-Cookie setzen
+  │                               │
+  │  GET /admin/auth/info         │
+  │  Cookie: token=...    ──────► │ 7. jwtAuth-Middleware: Cookie auslesen
+  │                               │ 8. JWT verifizieren → user ins Context
+  │                               │ 9. requireAuth: user vorhanden?
+  │  200 { data: admin }          │
+  │ ◄──────────────────────────── │ 10. Admin-Daten zurück
 ```
 
-Das Passwort wird **niemals im Klartext** gespeichert. `argon2` ist ein moderner, sicherer Hashing-Algorithmus — `verify()` vergleicht das eingegebene Passwort mit dem gespeicherten Hash.
+### Login-Request
 
-Beide Fehler (User nicht gefunden & falsches Passwort) geben dieselbe Meldung `"Invalid credentials"` zurück, damit kein Angreifer herausfinden kann, ob eine E-Mail existiert.
+```http
+POST /admin/auth/login
+Content-Type: application/json
 
----
-
-### 4. Controller — JWT erstellen & Cookie setzen
-
-**Datei:** `src/features/auth/controller.ts`
-
-Nach erfolgreichem Login signiert der Controller ein JWT:
-
-```ts
-const token = await sign(
-  {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-    exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24, // 24 Stunden
-  },
-  JWT_SECRET,
-)
+{
+  "employeeId": "01JX...",
+  "pin": "11111"
+}
 ```
 
-Das JWT enthält die User-ID, E-Mail und die Rolle. Es läuft nach **24 Stunden** ab.
-
-Danach wird das Token als **HttpOnly-Cookie** gesetzt:
-
-```ts
-setCookie(c, 'token', token, {
-  httpOnly: true,   // nicht per JavaScript auslesbar → XSS-Schutz
-  secure: true,     // nur über HTTPS (in Produktion)
-  sameSite: 'Strict', // kein Cross-Site-Sending → CSRF-Schutz
-  maxAge: 3600 * 24,
-})
-```
-
-Der Client bekommt den Token **nie direkt** zurück — nur im Cookie. Die Response enthält lediglich die öffentlichen User-Daten:
+### Login-Response `200`
 
 ```json
 {
   "data": {
-    "id": "clxyz123",
-    "email": "user@example.com",
-    "role": "USER"
+    "id": "01JX...",
+    "email": "a.bauer@bayernsoft.de",
+    "role": "ADMIN",
+    "companyId": "01JX..."
   }
 }
 ```
 
----
-
-### 5. Folge-Requests — Cookie automatisch prüfen
-
-**Datei:** `src/middleware/jwt-auth.ts`
-
-Bei **jedem** Request läuft die `jwtAuth`-Middleware (registriert in `src/app.ts` via `app.use('*', jwtAuth)`):
-
+Cookie wird automatisch gesetzt:
 ```
-Eingehender Request
-  │
-  ├─ Cookie "token" vorhanden?
-  │   ├─ Nein → weiter (user = undefined im Context)
-  │   └─ Ja → JWT verifizieren
-  │       ├─ ungültig / abgelaufen → weiter (user = undefined, kein Fehler)
-  │       └─ gültig → user ins Hono-Context setzen (c.set('user', payload))
-  │
-  └─ next() → Route-Handler
+Set-Cookie: token=eyJ...; HttpOnly; SameSite=Strict; Max-Age=28800
 ```
 
-Die Middleware wirft bei einem ungültigen Token **keinen Fehler** — sie setzt einfach keinen User. Ob ein User erforderlich ist, entscheidet die Route selbst.
+### Fehlercodes Login
+
+| Status | Grund |
+|--------|-------|
+| `400` | Fehlende oder ungültige Felder |
+| `401` | Employee nicht gefunden oder PIN falsch |
+| `403` | Employee existiert, hat aber keine ADMIN-Rolle |
 
 ---
 
-### 6. Geschützte Routen — `requireAuth`
+## Session prüfen — `/admin/auth/info`
 
-**Datei:** `src/middleware/require-auth.ts`
+Das Frontend ruft diese Route beim Start auf, um zu prüfen ob der Admin noch eingeloggt ist.
 
-Routen die einen eingeloggten User voraussetzen (z. B. `GET /auth/me`) nutzen die `requireAuth`-Middleware:
-
-```ts
-const user = c.get('user')
-if (!user) return c.json({ error: 'UNAUTHORIZED' }, 401)
+```http
+GET /admin/auth/info
+Cookie: token=eyJ...
 ```
 
-Sie liest einfach den User aus dem Context, den `jwtAuth` zuvor gesetzt hat.
+```json
+{
+  "data": {
+    "id": "01JX...",
+    "email": "a.bauer@bayernsoft.de",
+    "role": "ADMIN",
+    "companyId": "01JX..."
+  }
+}
+```
 
----
-
-### 7. Rollen & Permissions
-
-**Datei:** `src/lib/permissions.ts`
-
-Jeder User hat eine Rolle (`USER`, `ADMIN`, `NONE`). Rollen haben fest definierte Permissions:
-
-| Rolle   | Permissions                                              |
-|---------|----------------------------------------------------------|
-| `USER`  | `todo:read`, `todo:write`                                |
-| `ADMIN` | `todo:read`, `todo:write`, `todo:delete`, `user:read`, `user:manage` |
-| `NONE`  | —                                                        |
-
-Die Todos-Routen prüfen Permissions via `requirePermission`-Middleware. Fehlt die Permission → **403 Forbidden**.
+- `200` → eingeloggt, im Dashboard bleiben
+- `401` → nicht eingeloggt, zur Login-Seite weiterleiten
 
 ---
 
 ## Logout
 
-`POST /auth/logout` löscht das Cookie, indem es mit `maxAge: 0` überschrieben wird:
-
-```ts
-setCookie(c, 'token', '', { maxAge: 0 })
+```http
+POST /admin/auth/logout
 ```
 
-Der Client sendet das Cookie danach nicht mehr mit.
+Löscht das Cookie mit `Max-Age=0`. Danach gibt `/admin/auth/info` wieder `401` zurück.
+
+---
+
+## JWT-Middleware (`jwtAuth`)
+
+Läuft auf allen `/admin/*`-Routen (registriert in `src/app.ts`):
+
+```
+Eingehender Request an /admin/*
+  │
+  ├─ Cookie "token" vorhanden?
+  │   ├─ Nein → weiter (user = undefined)
+  │   └─ Ja → JWT verifizieren
+  │       ├─ ungültig/abgelaufen → weiter (user = undefined)
+  │       └─ gültig → c.set('user', payload)
+  │
+  └─ next()
+```
+
+Die `requireAuth`-Middleware auf geschützten Routen prüft dann ob `c.get('user')` gesetzt ist — falls nicht → `401`.
 
 ---
 
 ## Relevante Dateien
 
 | Datei | Zweck |
-|---|---|
-| `src/features/auth/routes.ts` | Routen-Definition mit OpenAPI-Schema |
-| `src/features/auth/controller.ts` | JWT signieren, Cookie setzen |
-| `src/features/auth/service.ts` | DB-Abfrage, Passwort-Verifikation |
-| `src/features/auth/schema.ts` | Zod-Validierungsschemas |
-| `src/middleware/jwt-auth.ts` | Cookie auslesen, JWT verifizieren (global) |
+|-------|-------|
+| `src/features/admin/auth/controller.ts` | JWT signieren, Cookie setzen/löschen |
+| `src/features/admin/auth/service.ts` | DB-Abfrage, PIN-Prüfung, Rollen-Check |
+| `src/features/admin/auth/routes.ts` | `/login`, `/info`, `/logout` |
+| `src/features/auth/controller.ts` | Kiosk-Identify Controller |
+| `src/features/auth/service.ts` | `identifyEmployee()` |
+| `src/middleware/jwt-auth.ts` | Cookie auslesen, JWT verifizieren |
 | `src/middleware/require-auth.ts` | Prüft ob User im Context vorhanden |
-| `src/lib/permissions.ts` | Rollen & Permission-Mapping |

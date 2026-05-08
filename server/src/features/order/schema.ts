@@ -4,6 +4,7 @@ export { ErrorSchema } from "../../schemas/common.js";
 
 export const OrderBodySchema = z.object({
   employeeId: z.string(),
+  pin: z.string().min(5).max(5),
   orders: z.array(
     z.object({
       productId: z.string(),

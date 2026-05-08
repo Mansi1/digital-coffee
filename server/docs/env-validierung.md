@@ -88,7 +88,7 @@ const schema = z.object({
 # .env
 DATABASE=postgresql://user:pw@localhost:5432/mydb
 JWT_SECRET=supersecretkey1234567
-CORS_ORIGIN=http://localhost:9000
+CORS_ORIGIN=http://localhost:5173
 PORT=3000
 LOG_LEVEL=debug
 ```
@@ -99,7 +99,7 @@ LOG_LEVEL=debug
 # .env.example
 DATABASE="postgresql://USER:PW@DATENBANK:PORT/SCHEMA"
 JWT_SECRET="JWT"
-CORS_ORIGIN="http://localhost:9000"
+CORS_ORIGIN="http://localhost:5173"
 PORT=3000
 LOG_LEVEL=info
 ```

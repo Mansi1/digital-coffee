@@ -19,7 +19,7 @@ export class OrderService {
       }
 
       const order = await prisma.order.create({
-        data: { employeeId, productId, amount, price: product.price * amount },
+        data: { employeeId, productId, amount, price: Math.round(product.price * amount * 100) / 100 },
       });
       created.push(order);
     }

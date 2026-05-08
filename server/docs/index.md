@@ -1,25 +1,26 @@
 ---
-# https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
 hero:
-  name: "Rest Dokumentation"
-  text: "A VitePress Site"
-  tagline: My great project tagline
+  name: "Digital Coffee"
+  text: "Server Dokumentation"
+  tagline: REST API für das Kaffeekassen-System — Kiosk, Admin & Bestellungen
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: Kiosk-Routen
+      link: /kiosk
+    - theme: brand
+      text: Admin-Routen
+      link: /admin
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: Datenmodell
+      link: /datenmodell
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Kiosk
+    details: Mitarbeiter identifizieren sich per PIN und bestellen Getränke. Öffentliche Routen, kein Login erforderlich.
+  - title: Admin
+    details: JWT-geschützter Bereich. Produkte verwalten, Bestellhistorie einsehen, Mitarbeiter deaktivieren.
+  - title: Soft-Delete
+    details: Statt isActive wird deactivatedAt verwendet — deaktivierte Einträge bleiben mit Zeitstempel erhalten.
 ---
-

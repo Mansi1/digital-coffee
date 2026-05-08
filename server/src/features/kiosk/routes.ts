@@ -20,33 +20,6 @@ import z from "zod";
 
 const { router: kioskRoutes } = new Routes([
   {
-    path: "/identify",
-    method: "post",
-    tags: ["Kiosk"],
-    description: "Identify employee with ID and PIN",
-    request: {
-      body: {
-        content: { "application/json": { schema: AuthLoginSchema } },
-        required: true,
-      },
-    },
-    responses: {
-      200: {
-        content: { "application/json": { schema: AuthResponseSchema } },
-        description: "Employee identified successfully",
-      },
-      400: {
-        content: { "application/json": { schema: AuthErrorSchema } },
-        description: "Invalid request data",
-      },
-      401: {
-        content: { "application/json": { schema: AuthErrorSchema } },
-        description: "Invalid credentials",
-      },
-    },
-    controllerFN: AuthController.identify,
-  },
-  {
     path: "/products",
     method: "get",
     tags: ["Kiosk"],

@@ -1,39 +1,41 @@
 import { defineConfig } from 'vitepress'
 
-// https://vitepress.dev/reference/site-config
 export default defineConfig({
   vite: {
     server: {
       host: '0.0.0.0',
     },
   },
-  title: 'Rest Dokumentation',
-  description: 'A VitePress Site',
+  title: 'Digital Coffee',
+  description: 'REST API Dokumentation — Kiosk, Admin & Bestellungen',
   themeConfig: {
-    // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' },
+      { text: 'Kiosk', link: '/kiosk' },
+      { text: 'Admin', link: '/admin' },
     ],
 
     sidebar: [
       {
-        text: 'Examples',
+        text: 'Routen',
         items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' },
+          { text: 'Kiosk', link: '/kiosk' },
+          { text: 'Admin', link: '/admin' },
         ],
       },
       {
-        text: 'Authentifizierung',
-        items: [{ text: 'Login & Auth-Flow', link: '/login' }],
+        text: 'Konzepte',
+        items: [
+          { text: 'Auth-Flow', link: '/login' },
+          { text: 'Datenmodell', link: '/datenmodell' },
+        ],
       },
       {
-        text: 'Validierung',
+        text: 'Konfiguration',
         items: [{ text: 'Env-Validierung', link: '/env-validierung' }],
       },
     ],
 
-    socialLinks: [{ icon: 'github', link: 'https://github.com/vuejs/vitepress' }],
+    socialLinks: [],
   },
 })

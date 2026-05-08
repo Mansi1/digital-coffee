@@ -1,37 +1,33 @@
 import { PrismaClient } from "../../src/generated/prisma/client";
 
 export async function seedCompany(prisma: PrismaClient) {
-  const exampleCompany = await prisma.company.upsert({
-    where: {
-      email: "info@example.com",
-    },
-    create: {
-      name: "Example GmbH",
-      email: "info@example.com",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    update: {
-      name: "Example GmbH",
-      updatedAt: new Date(),
-    },
-  });
+  const companies = await Promise.all([
+    prisma.company.upsert({
+      where: { email: "info@bayernsoft.de" },
+      create: { name: "BayernSoft GmbH", email: "info@bayernsoft.de" },
+      update: { name: "BayernSoft GmbH" },
+    }),
+    prisma.company.upsert({
+      where: { email: "info@waldtec.de" },
+      create: { name: "WaldTec AG", email: "info@waldtec.de" },
+      update: { name: "WaldTec AG" },
+    }),
+    prisma.company.upsert({
+      where: { email: "info@deggendorf-digital.de" },
+      create: { name: "Deggendorf Digital KG", email: "info@deggendorf-digital.de" },
+      update: { name: "Deggendorf Digital KG" },
+    }),
+    prisma.company.upsert({
+      where: { email: "info@donaulogistik.de" },
+      create: { name: "Donau Logistik GmbH", email: "info@donaulogistik.de" },
+      update: { name: "Donau Logistik GmbH" },
+    }),
+  ]);
 
-  const anotherCompany = await prisma.company.upsert({
-    where: {
-      email: "info@anotherCompany.com",
-    },
-    create: {
-      name: "Another Company AG",
-      email: "info@anotherCompany.com",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    update: {
-      name: "Another Company AG",
-      updatedAt: new Date(),
-    },
-  });
-
-  return { exampleCompany, anotherCompany };
+  return {
+    bayernSoft: companies[0],
+    waldTec: companies[1],
+    deggendorfDigital: companies[2],
+    donauLogistik: companies[3],
+  };
 }
