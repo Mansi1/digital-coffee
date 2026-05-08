@@ -1,7 +1,7 @@
 import { hash } from "argon2";
 import { PrismaClient } from "../../src/generated/prisma/client";
 
-export async function seedUser(prisma: PrismaClient) {
+export async function seedEmployees(prisma: PrismaClient) {
   const exampleCompany = await prisma.company.findUniqueOrThrow({
     where: { email: "info@example.com" },
   });

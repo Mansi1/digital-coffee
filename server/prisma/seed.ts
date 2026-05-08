@@ -2,7 +2,7 @@ import { prisma } from "../src/lib/prisma.js";
 import { seedCompany } from "./data/company.js";
 import { seedOrders } from "./data/order.js";
 import { seedProduct } from "./data/product.js";
-import { seedUser } from "./data/user.js";
+import { seedEmployees } from "./data/employees.js";
 
 async function main() {
   // Delete existing data
@@ -13,7 +13,7 @@ async function main() {
 
   // Seed new data
   const { exampleCompany, anotherCompany } = await seedCompany(prisma);
-  const { admin, user } = await seedUser(prisma);
+  const { admin, user } = await seedEmployees(prisma);
   const { productCount } = await seedProduct(prisma);
 
   const { orderCount } = await seedOrders(prisma);
