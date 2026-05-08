@@ -2,19 +2,20 @@ import { z } from 'zod'
 
 export { ErrorSchema } from '../../schemas/common.js'
 
-export const AuthBodySchema = z.object({
-  email: z.email(),
-  password: z.string().min(6),
+export const AuthLoginSchema = z.object({
+  employeeId: z.string(),
+  pin: z.string().min(4),
 })
 
-export type TAuthBodySchema = z.infer<typeof AuthBodySchema>
+export type TAuthLoginSchema = z.infer<typeof AuthLoginSchema>
 
-export const AuthUserSchema = z.object({
+export const AuthEmployeeSchema = z.object({
   id: z.string(),
   email: z.email(),
-  role: z.enum(['USER', 'ADMIN']),
+  role: z.enum(['USER', 'ADMIN', 'NONE']),
+  companyId: z.string(),
 })
 
 export const AuthResponseSchema = z.object({
-  data: AuthUserSchema,
+  data: AuthEmployeeSchema,
 })
