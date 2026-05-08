@@ -19,7 +19,7 @@ export const ProductCard = ({
     <>
       <div
         className={cn(
-          'text-primary-100 bg-primary-250 border-2 border-primary-350 rounded-2xl w-50',
+          'text-primary-100 bg-[#be9072] border-2 border-primary-350 rounded-2xl w-50',
           {
             '': amount > 0,
           },

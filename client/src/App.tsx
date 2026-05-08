@@ -1,28 +1,41 @@
-import { useEffect, useMemo, useState } from 'react';
-import { kioskApi, type Product } from './api';
-import { ProductCard } from './components/ProductCard';
-import { chunkArray } from './functions/chunkArray';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { kioskApi, type Employee, type Product } from './api';
 import { Layout } from './components/Layout';
-import { renderPrice } from './functions/renderPrice';
-import PinInput from './components/PinInput';
-import { Button } from './components/Button';
+import LoadingIcon from './assets/loading.svg?react';
+import { SelectProducts } from './assets/section/SelectProducts';
+import UserSelectionList from './assets/section/UserSelectionList';
+import { Confirmation } from './assets/section/Confirmation';
 
-type ProductState =
-  | { state: 'LOADING' |'ERROR' }
-  | { state: 'SUCCESS'; products: Array<Product> };
+type AppState =
+  | { state: 'LOADING' | 'ERROR' }
+  | { state: 'SUCCESS'; products: Array<Product>; employees: Array<Employee> };
+
+const STEPS = ['SELECT_PRODUCT', 'SELECT_USER', 'CONFIRMATION'] as const;
+
+type Step = (typeof STEPS)[number];
+const DEFAULT_STEP: Step = STEPS[0];
 function App() {
-  const [productLoadingState, setProductLoadingState] = useState<ProductState>({
+  const [appState, setAppState] = useState<AppState>({
     state: 'LOADING',
   });
+
   const [orderList, setOrderList] = useState<Record<string, number>>({});
+  const [selectedEmployee, setSelectedEmployee] = useState<
+    Employee | undefined
+  >(undefined);
+
+  const [step, setStep] = useState<Step>(DEFAULT_STEP);
 
   const loadProducts = async () => {
     try {
-      setProductLoadingState({ state: 'LOADING' });
+      setAppState({ state: 'LOADING' });
+      const wait = new Promise((r) => setTimeout(r, 500));
       const products = await kioskApi.getProducts();
-      setProductLoadingState({ state: 'SUCCESS', products });
+      const employees = await kioskApi.getEmployees();
+      await wait;
+      setAppState({ state: 'SUCCESS', products, employees });
     } catch (e) {
-      setProductLoadingState({ state: 'ERROR' });
+      setAppState({ state: 'ERROR' });
     }
   };
   useEffect(() => {
@@ -40,58 +53,58 @@ function App() {
     });
   };
 
-  const totalPrice = useMemo(() => {
-    if (productLoadingState.state !== 'SUCCESS') {
-      return 0;
+  const handleConfirm = async(
+    employee: Employee,
+    pin: string,
+    orders: Array<{ productId: string; amount: number }>,
+  ) => {
+    if (!selectedEmployee) {
+      return;
     }
-    return Object.entries(orderList).reduce((prev, [productId, amount]) => {
-      if (amount > 0) {
-        const product = productLoadingState.products.find(
-          (product) => product.id == productId,
-        );
-        if (product) {
-          return prev + amount * product.price;
-        }
-      }
-      return prev;
-    }, 0);
-  }, [orderList, productLoadingState]);
+    await kioskApi.order({ employeeId: employee.id, pin, orders });
+  };
 
   return (
     <Layout>
-      {productLoadingState.state === 'SUCCESS' && (
+      {appState.state === 'LOADING' && (
+        <div className="flex justify-center m-4">
+          <LoadingIcon className="w-50 animate-spin fill-primary-350" />
+        </div>
+      )}
+      {appState.state === 'SUCCESS' && (
         <>
-          <div className="flex justify-center">
-            <div className="flex flex-col gap-y-5 mt-8 m-4">
-              {chunkArray(productLoadingState.products).map(
-                (productChunk, index) => (
-                  <div
-                    key={'junk-id' + index}
-                    className="flex flex-row gap-5 flex-wrap justify-self-start"
-                  >
-                    {productChunk.map((p) => (
-                      <ProductCard
-                        key={p.id + '-porduct-card'}
-                        product={p}
-                        amount={orderList[p.id] ?? 0}
-                        onPlusClick={handleOnProductClick('plus')}
-                        onMinusClick={handleOnProductClick('minus')}
-                      />
-                    ))}
-                  </div>
-                ),
-              )}
-            </div>
-          </div>
-          <div className="flex justify-center">
-            <Button
-              disabled={totalPrice === 0}
-              onClick={() => {}}
-            >
-              Weiter {renderPrice(totalPrice)}
-            </Button>
-          </div>
-          <PinInput  onComplete={(pin)=> {alert(pin)}} />
+          {step === 'SELECT_PRODUCT' && (
+            <SelectProducts
+              products={appState.products}
+              orderList={orderList}
+              onNextClick={() => {
+                setStep('SELECT_USER');
+              }}
+              onProductClick={handleOnProductClick}
+            />
+          )}
+          {step === 'SELECT_USER' && (
+            <UserSelectionList
+              employees={appState.employees}
+              onSelect={(employee) => {
+                setSelectedEmployee(employee);
+                setStep('CONFIRMATION');
+              }}
+            />
+          )}
+          {step === 'CONFIRMATION' && !!selectedEmployee && (
+            <Confirmation
+              employee={selectedEmployee}
+              onBackClick={() => setStep('SELECT_PRODUCT')}
+              onConfirm={(pin) =>
+                handleConfirm(
+                  selectedEmployee,
+                  pin,
+                  Object.entries(orderList).filter(([,amount])=> amount > 0).map(([productId, amount])=> ({productId, amount})),
+                )
+              }
+            />
+          )}
         </>
       )}
     </Layout>

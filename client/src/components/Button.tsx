@@ -17,7 +17,8 @@ export const Button = ({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'mt-4 w-full h-14 rounded-xl flex items-center justify-center transition-all bg-primary-450 text-white shadow-md active:scale-[0.98]',
+        'w-full h-14 rounded-xl flex items-center justify-center transition-all bg-primary-450 text-white shadow-md active:scale-[0.98] cursor-pointer',
+        {"bg-stone-200 text-stone-400 cursor-not-allowed": disabled},
         className,
       )}
     >
