@@ -1,35 +1,36 @@
-import { hash } from 'argon2'
-import type { PrismaClient } from '../../src/generated/prisma/client.js'
+import { hash } from "argon2";
+import { PrismaClient } from "../../src/generated/prisma/client";
 
 export async function seedUser(prisma: PrismaClient) {
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@devroots.de' },
+  const exampleCompany = await prisma.company.findUniqueOrThrow({
+    where: { email: "info@example.com" },
+  });
+
+  const anotherCompany = await prisma.company.findUniqueOrThrow({
+    where: { email: "info@anotherCompany.com" },
+  });
+
+  const admin = await prisma.employee.upsert({
+    where: { email: "john.doe@example.com" },
     update: {},
     create: {
-      email: 'admin@devroots.de',
-      passwort: await hash('admin1234'),
-      role: 'ADMIN',
+      email: "john.doe@example.com",
+      pin: await hash("12345"),
+      role: "ADMIN",
+      company: { connect: { id: exampleCompany.id } },
     },
-  })
+  });
 
-  const user = await prisma.user.upsert({
-    where: { email: 'user@devroots.de' },
+  const user = await prisma.employee.upsert({
+    where: { email: "max.mustermann@example.com" },
     update: {},
     create: {
-      email: 'user@devroots.de',
-      passwort: await hash('user1234'),
+      email: "max.mustermann@example.com",
+      pin: await hash("12345"),
+      role: "USER",
+      company: { connect: { id: anotherCompany.id } },
     },
-  })
+  });
 
-  const none = await prisma.user.upsert({
-    where: { email: 'none@devroots.de' },
-    update: {},
-    create: {
-      email: 'none@devroots.de',
-      passwort: await hash('none1234'),
-      role: 'NONE',
-    },
-  })
-
-  return { admin, user, none }
+  return { admin, user };
 }

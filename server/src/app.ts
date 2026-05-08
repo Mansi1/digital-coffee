@@ -22,7 +22,8 @@ app.notFound(notFound)
 app.get('/', (c) => c.json({ message: 'API is running' }))
 
 app.route('/auth', authRoutes)
-app.route('/todos', todosRoutes)
+app.route("/products", )
+
 
 app.doc('/openapi.json', {
   openapi: '3.0.0',
