@@ -12,6 +12,8 @@ import {
   OrderResponseSchema,
 } from "../order/schema.js";
 import { ProductController } from "../product/controller.js";
+import { EmployeeController } from "../employee/controller.js";
+import { EmployeeResponseSchema } from "../employee/schema.js";
 
 const { router: kioskRoutes } = new Routes([
   {
@@ -84,6 +86,23 @@ const { router: kioskRoutes } = new Routes([
       },
     },
     controllerFN: OrderController.placeOrder,
+  },
+  {
+    path: "/employees",
+    method: "get",
+    tags: ["Kiosk"],
+    description: "Get list of active employees (for testing/demo purposes)",
+    responses: {
+      200: {
+        content: { "application/json": { schema: EmployeeResponseSchema } },
+        description: "List of employees retrieved successfully",
+      },
+      500: {
+        content: { "application/json": { schema: ErrorSchema } },
+        description: "Server error while retrieving employees",
+      },
+    },
+    controllerFN: EmployeeController.getAll,
   },
 ]);
 

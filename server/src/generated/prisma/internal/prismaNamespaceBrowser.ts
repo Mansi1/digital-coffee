@@ -86,12 +86,14 @@ export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeo
 
 export const EmployeeScalarFieldEnum = {
   id: 'id',
+  name: 'name',
   email: 'email',
   pin: 'pin',
   role: 'role',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  companyId: 'companyId'
+  companyId: 'companyId',
+  isActive: 'isActive'
 } as const
 
 export type EmployeeScalarFieldEnum = (typeof EmployeeScalarFieldEnum)[keyof typeof EmployeeScalarFieldEnum]

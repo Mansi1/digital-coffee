@@ -15,6 +15,7 @@ export async function seedUser(prisma: PrismaClient) {
     update: {},
     create: {
       email: "john.doe@example.com",
+      name: "John Doe",
       pin: await hash("12345"),
       role: "ADMIN",
       company: { connect: { id: exampleCompany.id } },
@@ -25,6 +26,7 @@ export async function seedUser(prisma: PrismaClient) {
     where: { email: "max.mustermann@example.com" },
     update: {},
     create: {
+      name: "Max Mustermann",
       email: "max.mustermann@example.com",
       pin: await hash("12345"),
       role: "USER",

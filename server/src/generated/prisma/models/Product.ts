@@ -397,10 +397,6 @@ export type ProductUpdateOneRequiredWithoutOrdersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutOrdersInput, Prisma.ProductUpdateWithoutOrdersInput>, Prisma.ProductUncheckedUpdateWithoutOrdersInput>
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type ProductCreateWithoutOrdersInput = {
   id?: string
   name: string

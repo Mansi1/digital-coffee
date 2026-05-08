@@ -755,12 +755,14 @@ export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeo
 
 export const EmployeeScalarFieldEnum = {
   id: 'id',
+  name: 'name',
   email: 'email',
   pin: 'pin',
   role: 'role',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  companyId: 'companyId'
+  companyId: 'companyId',
+  isActive: 'isActive'
 } as const
 
 export type EmployeeScalarFieldEnum = (typeof EmployeeScalarFieldEnum)[keyof typeof EmployeeScalarFieldEnum]
@@ -856,6 +858,13 @@ export type ListEnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -880,13 +889,6 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 /**
