@@ -3,5 +3,6 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  "include": ["src"] // Dies stellt sicher, dass die .d.ts Dateien im src-Ordner gelesen werden
 }
