@@ -5,7 +5,7 @@ export type LayoutProps = {children: ReactNode}
 export const Layout = ({children}: LayoutProps)=>{
 
   return (
-    <main>
+    <main className="mb-4">
       <div>
         <div className="flex justify-center">
           <img src={reactLogo} width={200} />

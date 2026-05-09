@@ -1,6 +1,0 @@
-[
-    {"id": "Espresso", "name": "Espresso", "price": 0.5},
-    {"id": "Kaffe", "name": "Kaffee", "price": 0.5},
-    {"id": "Cappucino", "name": "Cappucino", "price": 0.8},
-    {"id": "Latte macchiato", "name": "Latte macchiato", "price": 1.2}
-]

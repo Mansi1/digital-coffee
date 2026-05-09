@@ -19,10 +19,7 @@ export const ProductCard = ({
     <>
       <div
         className={cn(
-          'text-primary-100 bg-[#be9072] border-2 border-primary-350 rounded-2xl w-50',
-          {
-            '': amount > 0,
-          },
+          'text-primary-100 bg-[#be9072] border-2 border-primary-350 rounded-2xl w-50 flex flex-col'
         )}
       >
         {amount > 0 && (
@@ -33,11 +30,12 @@ export const ProductCard = ({
             <MinusIcon className="h-10 rounded-tl-2xl rounded-br-2xl bg-primary-150" />
           </button>
         )}
+        <div className="flex-1">
         <div
-          className="h-full flex flex-col"
+          className="h-flex flex flex-col h-full"
           onClick={() => onPlusClick(product.id)}
         >
-          <button className="px-10 pt-15 cursor-pointer mb-4">
+          <button className="px-10 flex-1 pt-15 cursor-pointer mb-4">
             <div className="flex justify-center">
               <img src={coffeeLogo} width={100} />
             </div>
@@ -55,7 +53,7 @@ export const ProductCard = ({
             )}
           >
             {amount}
-          </div>
+          </div></div>
         </div>
       </div>
     </>

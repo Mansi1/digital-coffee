@@ -41,7 +41,7 @@ export const SelectProducts = ({
           {chunkArray(products).map((productChunk, index) => (
             <div
               key={'junk-id' + index}
-              className="flex flex-row gap-5 flex-wrap justify-self-start"
+              className="flex flex-row gap-5 flex-wrap justify-self-start items-stretch"
             >
               {productChunk.map((p) => (
                 <ProductCard
