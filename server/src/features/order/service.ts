@@ -2,6 +2,19 @@ import { HTTPException } from "hono/http-exception";
 import { prisma } from "../../lib/prisma.js";
 
 export class OrderService {
+  static async getByEmployee(employeeId: string) {
+    const employee = await prisma.employee.findUnique({ where: { id: employeeId } });
+    if (!employee) {
+      throw new HTTPException(404, { message: "Employee not found" });
+    }
+
+    return prisma.order.findMany({
+      where: { employeeId },
+      include: { product: { select: { name: true, price: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
   static async placeOrder(
     employeeId: string,
     orders: { productId: string; amount: number }[],

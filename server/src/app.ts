@@ -5,6 +5,9 @@ import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { adminAuthRoutes } from './features/admin/auth/routes.js'
 import { adminProductRoutes } from './features/admin/product/routes.js'
+import { adminEmployeeRoutes } from './features/admin/employee/routes.js'
+import { adminCompanyRoutes } from './features/admin/company/routes.js'
+import { adminOrderRoutes } from './features/admin/order/routes.js'
 import { kioskRoutes } from './features/kiosk/routes.js'
 import { notFound, onError } from './middleware/error-handler.js'
 import { jwtAuth } from './middleware/jwt-auth.js'
@@ -22,6 +25,9 @@ app.get('/', (c) => c.json({ message: 'API is running' }))
 app.route('/kiosk', kioskRoutes)
 app.route('/admin/auth', adminAuthRoutes)
 app.route('/admin/products', adminProductRoutes)
+app.route('/admin/employees', adminEmployeeRoutes)
+app.route('/admin/companies', adminCompanyRoutes)
+app.route('/admin/orders', adminOrderRoutes)
 
 app.doc('/openapi.json', {
   openapi: '3.0.0',

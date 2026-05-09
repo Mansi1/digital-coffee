@@ -136,6 +136,41 @@ const { router: kioskRoutes } = new Routes([
     },
     controllerFN: AuthController.register,
   },
+  {
+    path: "/orders/{employeeId}",
+    method: "get",
+    tags: ["Kiosk"],
+    description: "Get order history for a specific employee",
+    request: {
+      params: z.object({ employeeId: z.string() }),
+    },
+    responses: {
+      200: {
+        content: {
+          "application/json": {
+            schema: z.object({
+              data: z.array(
+                z.object({
+                  id: z.string(),
+                  productId: z.string(),
+                  productName: z.string(),
+                  amount: z.number().int(),
+                  price: z.number(),
+                  createdAt: z.string(),
+                }),
+              ),
+            }),
+          },
+        },
+        description: "Order history retrieved successfully",
+      },
+      404: {
+        content: { "application/json": { schema: ErrorSchema } },
+        description: "Employee not found",
+      },
+    },
+    controllerFN: OrderController.getByEmployee,
+  },
 ]);
 
 export { kioskRoutes };

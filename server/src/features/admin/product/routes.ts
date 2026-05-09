@@ -9,6 +9,9 @@ import {
   ProductUpdateSchema,
 } from "./schema.js";
 import { requireAuth } from "../../../middleware/require-auth.js";
+import { requireRole } from "../../../middleware/require-role.js";
+
+const adminGuard = [requireAuth, requireRole("ADMIN")];
 
 const { router: adminProductRoutes } = new Routes([
   {
@@ -16,6 +19,7 @@ const { router: adminProductRoutes } = new Routes([
     method: "get",
     tags: ["Admin"],
     description: "List all products",
+    middleware: adminGuard,
     responses: {
       200: {
         content: { "application/json": { schema: ProductListResponseSchema } },
@@ -33,7 +37,7 @@ const { router: adminProductRoutes } = new Routes([
     method: "post",
     tags: ["Admin"],
     description: "Create a new product",
-    middleware: [requireAuth],
+    middleware: adminGuard,
     request: {
       body: {
         content: { "application/json": { schema: ProductCreateSchema } },
@@ -61,7 +65,7 @@ const { router: adminProductRoutes } = new Routes([
     method: "patch",
     tags: ["Admin"],
     description: "Update product name, price or active status",
-    middleware: [requireAuth],
+    middleware: adminGuard,
     request: {
       params: z.object({ id: z.string() }),
       body: {
@@ -94,7 +98,7 @@ const { router: adminProductRoutes } = new Routes([
     method: "delete",
     tags: ["Admin"],
     description: "Deactivate a product",
-    middleware: [requireAuth],
+    middleware: adminGuard,
     request: {
       params: z.object({ id: z.string() }),
     },
